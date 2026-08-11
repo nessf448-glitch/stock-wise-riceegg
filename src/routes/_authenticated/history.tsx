@@ -59,7 +59,7 @@ function HistoryPage() {
   const [to, setTo] = useState("");
 
   const productMap = new Map(products.map((p) => [p.id, p]));
-  const staffMap = new Map(profiles.map((p) => [p.id, p.full_name || p.email]));
+  const staffMap = new Map(profiles.map((p) => [p.id, p.full_name || p.username || "Staff"]));
 
   const filtered = txns.filter((t) => {
     const p = productMap.get(t.product_id);
