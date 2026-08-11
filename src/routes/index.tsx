@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Centralized rice and egg inventory with automatic stock updates, low-stock alerts and egg expiration monitoring.",
+          "Smart Inventory Management System with automated stock monitoring for CDP Enterprise's rice and egg inventory in Catalunan Grande, Davao City.",
       },
     ],
   }),

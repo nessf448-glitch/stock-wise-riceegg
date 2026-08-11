@@ -78,19 +78,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "CDP Enterprise — Smart Inventory System" },
+      { title: "CDP Enterprise Inventory — Rice & Egg Stock Monitoring" },
       {
         name: "description",
         content:
-          "Rice and egg inventory management with automated stock monitoring for CDP Enterprise, Catalunan Grande, Davao City.",
+          "Smart Inventory Management System with automated stock monitoring for CDP Enterprise's rice and egg inventory in Catalunan Grande, Davao City.",
       },
-      { property: "og:title", content: "CDP Enterprise — Smart Inventory System" },
+      { property: "og:title", content: "CDP Enterprise Inventory — Rice & Egg Stock Monitoring" },
       {
         property: "og:description",
-        content: "Automated stock monitoring for rice and egg inventory.",
+        content: "Smart Inventory Management System with automated stock monitoring for CDP Enterprise's rice and egg inventory in Catalunan Grande, Davao City.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "CDP Enterprise Inventory — Rice & Egg Stock Monitoring" },
+      { name: "twitter:description", content: "Smart Inventory Management System with automated stock monitoring for CDP Enterprise's rice and egg inventory in Catalunan Grande, Davao City." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3bd22969a2a79f6769ceb0574a9f546a/id-preview-ac3b54d3--7328e7cc-747a-4d91-a802-ceeefdb14d45.lovable.app-1786431796177.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3bd22969a2a79f6769ceb0574a9f546a/id-preview-ac3b54d3--7328e7cc-747a-4d91-a802-ceeefdb14d45.lovable.app-1786431796177.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
