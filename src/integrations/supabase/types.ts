@@ -14,7 +14,207 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      app_settings: {
+        Row: {
+          id: number
+          near_expiry_days: number
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          near_expiry_days?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          near_expiry_days?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      egg_batches: {
+        Row: {
+          batch_number: string
+          created_at: string
+          expiration_date: string
+          id: string
+          product_id: string
+          quantity: number
+        }
+        Insert: {
+          batch_number: string
+          created_at?: string
+          expiration_date: string
+          id?: string
+          product_id: string
+          quantity?: number
+        }
+        Update: {
+          batch_number?: string
+          created_at?: string
+          expiration_date?: string
+          id?: string
+          product_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "egg_batches_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_transactions: {
+        Row: {
+          created_at: string
+          id: string
+          note: string | null
+          product_id: string
+          quantity: number
+          reason: string | null
+          resulting_stock: number | null
+          type: Database["public"]["Enums"]["txn_type"]
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          product_id: string
+          quantity: number
+          reason?: string | null
+          resulting_stock?: number | null
+          type: Database["public"]["Enums"]["txn_type"]
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          product_id?: string
+          quantity?: number
+          reason?: string | null
+          resulting_stock?: number | null
+          type?: Database["public"]["Enums"]["txn_type"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_transactions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          category: Database["public"]["Enums"]["product_category"]
+          cost_price: number
+          created_at: string
+          id: string
+          is_active: boolean
+          min_stock: number
+          name: string
+          selling_price: number
+          stock_qty: number
+          supplier_id: string | null
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["product_category"]
+          cost_price?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          min_stock?: number
+          name: string
+          selling_price?: number
+          stock_qty?: number
+          supplier_id?: string | null
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["product_category"]
+          cost_price?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          min_stock?: number
+          name?: string
+          selling_price?: number
+          stock_qty?: number
+          supplier_id?: string | null
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string
+          id: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      suppliers: {
+        Row: {
+          address: string | null
+          contact_number: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          address?: string | null
+          contact_number?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          address?: string | null
+          contact_number?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +223,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      product_category: "rice" | "egg"
+      txn_type: "stock_in" | "stock_out" | "adjustment"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +351,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      product_category: ["rice", "egg"],
+      txn_type: ["stock_in", "stock_out", "adjustment"],
+    },
   },
 } as const
