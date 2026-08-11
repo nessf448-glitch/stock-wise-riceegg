@@ -166,7 +166,9 @@ function ProductsPage() {
       return;
     }
     try {
-      await save.mutateAsync({ id: editing?.id, values: parsed.data });
+      await save.mutateAsync(
+        editing ? { id: editing.id, values: parsed.data } : { values: parsed.data },
+      );
       toast.success(editing ? "Product updated" : "Product added");
       setOpen(false);
     } catch (err) {
