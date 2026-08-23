@@ -6,9 +6,9 @@ export function ProductThumb({
   name,
   className,
 }: {
-  url?: string | null;
+  url?: string | null | undefined;
   name: string;
-  className?: string;
+  className?: string | undefined;
 }) {
   return (
     <div
