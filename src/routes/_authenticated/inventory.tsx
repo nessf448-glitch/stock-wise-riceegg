@@ -189,7 +189,15 @@ function InventoryPage() {
             ) : (
               filtered.map((p) => (
                 <TableRow key={p.id}>
-                  <TableCell className="font-medium">{p.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-3">
+                      <ProductThumb
+                        url={p.image_path ? imageUrls[p.image_path] : null}
+                        name={p.name}
+                      />
+                      <span>{p.name}</span>
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <CategoryBadge category={p.category} />
                   </TableCell>
