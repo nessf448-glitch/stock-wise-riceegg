@@ -59,6 +59,7 @@ function InventoryPage() {
   const { data: suppliers = [] } = useSuppliers();
   const { data: batches = [] } = useBatches();
   const { data: settings } = useSettings();
+  const { data: imageUrls = {} } = useProductImageUrls(products.map((p) => p.image_path));
   const nearDays = settings?.near_expiry_days ?? 7;
 
   const [tab, setTab] = useState<"all" | "rice" | "egg">("all");
