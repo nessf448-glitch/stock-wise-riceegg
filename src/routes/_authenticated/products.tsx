@@ -347,6 +347,39 @@ function ProductsPage() {
           </DialogHeader>
           <form onSubmit={submit} className="space-y-4">
             <div className="space-y-1.5">
+              <Label>Product photo</Label>
+              <div className="flex items-center gap-3">
+                <ProductThumb
+                  url={photoPreview}
+                  name={form.name || "product"}
+                  className="size-20 rounded-lg"
+                />
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="outline" onClick={() => fileInput.current?.click()}>
+                    <Upload className="size-4" /> {photoPreview ? "Change photo" : "Upload photo"}
+                  </Button>
+                  {photoPreview ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="text-destructive"
+                      onClick={() => resetPhoto(null)}
+                    >
+                      <X className="size-4" /> Remove
+                    </Button>
+                  ) : null}
+                  <input
+                    ref={fileInput}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => pickPhoto(e.target.files?.[0])}
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">JPG, PNG or WebP, up to 5 MB.</p>
+            </div>
+            <div className="space-y-1.5">
               <Label htmlFor="name">Product name</Label>
               <Input
                 id="name"
