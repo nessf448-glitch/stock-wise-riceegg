@@ -20,11 +20,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ProductThumb } from "@/components/product-image";
 import {
   useProducts,
   useSuppliers,
   useBatches,
   useSettings,
+  useProductImageUrls,
   stockStatus,
   expiryStatus,
   inventoryValue,
