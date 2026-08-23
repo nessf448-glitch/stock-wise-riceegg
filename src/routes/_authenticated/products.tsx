@@ -102,12 +102,20 @@ const EMPTY = {
 function ProductsPage() {
   const { data: products = [], isLoading } = useProducts();
   const { data: suppliers = [] } = useSuppliers();
+  const { data: imageUrls = {} } = useProductImageUrls(products.map((p) => p.image_path));
   const save = useSaveProduct();
   const remove = useDeleteProduct();
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState({ ...EMPTY });
+  const [photo, setPhoto] = useState<{ path: string | null; file: File | null; preview: string | null }>({
+    path: null,
+    file: null,
+    preview: null,
+  });
+  const [uploading, setUploading] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<"all" | Category>("all");
@@ -121,9 +129,31 @@ function ProductsPage() {
       p.name.toLowerCase().includes(search.trim().toLowerCase()),
   );
 
+  function resetPhoto(path: string | null) {
+    setPhoto((prev) => {
+      if (prev.preview) URL.revokeObjectURL(prev.preview);
+      return { path, file: null, preview: null };
+    });
+    if (fileInput.current) fileInput.current.value = "";
+  }
+
+  function pickPhoto(file: File | undefined) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Please choose an image file (JPG, PNG or WebP).");
+      return;
+    }
+    setError(null);
+    setPhoto((prev) => {
+      if (prev.preview) URL.revokeObjectURL(prev.preview);
+      return { path: prev.path, file, preview: URL.createObjectURL(file) };
+    });
+  }
+
   function openAdd() {
     setEditing(null);
     setForm({ ...EMPTY });
+    resetPhoto(null);
     setError(null);
     setOpen(true);
   }
@@ -140,9 +170,12 @@ function ProductsPage() {
       min_stock: String(p.min_stock),
       supplier_id: p.supplier_id ?? "none",
     });
+    resetPhoto(p.image_path);
     setError(null);
     setOpen(true);
   }
+
+  const photoPreview = photo.preview ?? (photo.path ? imageUrls[photo.path] : null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -170,13 +203,25 @@ function ProductsPage() {
       return;
     }
     try {
+      let imagePath = photo.path;
+      if (photo.file) {
+        setUploading(true);
+        imagePath = await uploadProductImage(photo.file);
+      }
       await save.mutateAsync(
-        editing ? { id: editing.id, values: parsed.data } : { values: parsed.data },
+        editing
+          ? { id: editing.id, values: { ...parsed.data, image_path: imagePath } }
+          : { values: { ...parsed.data, image_path: imagePath } },
       );
+      const oldPath = editing?.image_path ?? null;
+      if (oldPath && oldPath !== imagePath) await removeProductImage(oldPath);
       toast.success(editing ? "Product updated" : "Product added");
+      resetPhoto(null);
       setOpen(false);
     } catch (err) {
       setError(friendlyError(err));
+    } finally {
+      setUploading(false);
     }
   }
 
