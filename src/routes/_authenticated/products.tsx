@@ -495,7 +495,8 @@ function ProductsPage() {
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={save.isPending}>
+              <Button type="submit" disabled={save.isPending || uploading}>
+                {uploading ? "Uploading photo…" : null}
                 {editing ? "Save changes" : "Save product"}
               </Button>
             </DialogFooter>
