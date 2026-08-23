@@ -20,11 +20,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ProductThumb } from "@/components/product-image";
 import {
   useProducts,
   useSuppliers,
   useBatches,
   useSettings,
+  useProductImageUrls,
   stockStatus,
   expiryStatus,
   inventoryValue,
@@ -57,6 +59,7 @@ function InventoryPage() {
   const { data: suppliers = [] } = useSuppliers();
   const { data: batches = [] } = useBatches();
   const { data: settings } = useSettings();
+  const { data: imageUrls = {} } = useProductImageUrls(products.map((p) => p.image_path));
   const nearDays = settings?.near_expiry_days ?? 7;
 
   const [tab, setTab] = useState<"all" | "rice" | "egg">("all");
@@ -186,7 +189,15 @@ function InventoryPage() {
             ) : (
               filtered.map((p) => (
                 <TableRow key={p.id}>
-                  <TableCell className="font-medium">{p.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-3">
+                      <ProductThumb
+                        url={p.image_path ? imageUrls[p.image_path] : null}
+                        name={p.name}
+                      />
+                      <span>{p.name}</span>
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <CategoryBadge category={p.category} />
                   </TableCell>

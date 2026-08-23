@@ -117,6 +117,7 @@ export type Database = {
           cost_price: number
           created_at: string
           id: string
+          image_path: string | null
           is_active: boolean
           min_stock: number
           name: string
@@ -131,6 +132,7 @@ export type Database = {
           cost_price?: number
           created_at?: string
           id?: string
+          image_path?: string | null
           is_active?: boolean
           min_stock?: number
           name: string
@@ -145,6 +147,7 @@ export type Database = {
           cost_price?: number
           created_at?: string
           id?: string
+          image_path?: string | null
           is_active?: boolean
           min_stock?: number
           name?: string

@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { useRef, useState } from "react";
+import { Plus, Pencil, Trash2, Search, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ProductThumb } from "@/components/product-image";
 import { PageHeader } from "@/components/app-shell";
 import { CategoryBadge, StockBadge } from "@/components/status-badges";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,9 @@ import {
   useSuppliers,
   useSaveProduct,
   useDeleteProduct,
+  useProductImageUrls,
+  uploadProductImage,
+  removeProductImage,
   stockStatus,
   friendlyError,
   peso,
@@ -98,12 +102,20 @@ const EMPTY = {
 function ProductsPage() {
   const { data: products = [], isLoading } = useProducts();
   const { data: suppliers = [] } = useSuppliers();
+  const { data: imageUrls = {} } = useProductImageUrls(products.map((p) => p.image_path));
   const save = useSaveProduct();
   const remove = useDeleteProduct();
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState({ ...EMPTY });
+  const [photo, setPhoto] = useState<{ path: string | null; file: File | null; preview: string | null }>({
+    path: null,
+    file: null,
+    preview: null,
+  });
+  const [uploading, setUploading] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<"all" | Category>("all");
@@ -117,9 +129,31 @@ function ProductsPage() {
       p.name.toLowerCase().includes(search.trim().toLowerCase()),
   );
 
+  function resetPhoto(path: string | null) {
+    setPhoto((prev) => {
+      if (prev.preview) URL.revokeObjectURL(prev.preview);
+      return { path, file: null, preview: null };
+    });
+    if (fileInput.current) fileInput.current.value = "";
+  }
+
+  function pickPhoto(file: File | undefined) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Please choose an image file (JPG, PNG or WebP).");
+      return;
+    }
+    setError(null);
+    setPhoto((prev) => {
+      if (prev.preview) URL.revokeObjectURL(prev.preview);
+      return { path: prev.path, file, preview: URL.createObjectURL(file) };
+    });
+  }
+
   function openAdd() {
     setEditing(null);
     setForm({ ...EMPTY });
+    resetPhoto(null);
     setError(null);
     setOpen(true);
   }
@@ -136,9 +170,12 @@ function ProductsPage() {
       min_stock: String(p.min_stock),
       supplier_id: p.supplier_id ?? "none",
     });
+    resetPhoto(p.image_path);
     setError(null);
     setOpen(true);
   }
+
+  const photoPreview = photo.preview ?? (photo.path ? imageUrls[photo.path] : null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -166,13 +203,25 @@ function ProductsPage() {
       return;
     }
     try {
+      let imagePath = photo.path;
+      if (photo.file) {
+        setUploading(true);
+        imagePath = await uploadProductImage(photo.file);
+      }
       await save.mutateAsync(
-        editing ? { id: editing.id, values: parsed.data } : { values: parsed.data },
+        editing
+          ? { id: editing.id, values: { ...parsed.data, image_path: imagePath } }
+          : { values: { ...parsed.data, image_path: imagePath } },
       );
+      const oldPath = editing?.image_path ?? null;
+      if (oldPath && oldPath !== imagePath) await removeProductImage(oldPath);
       toast.success(editing ? "Product updated" : "Product added");
+      resetPhoto(null);
       setOpen(false);
     } catch (err) {
       setError(friendlyError(err));
+    } finally {
+      setUploading(false);
     }
   }
 
@@ -242,7 +291,15 @@ function ProductsPage() {
             ) : (
               filtered.map((p) => (
                 <TableRow key={p.id}>
-                  <TableCell className="font-medium">{p.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-3">
+                      <ProductThumb
+                        url={p.image_path ? imageUrls[p.image_path] : null}
+                        name={p.name}
+                      />
+                      <span>{p.name}</span>
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <CategoryBadge category={p.category} />
                   </TableCell>
@@ -289,6 +346,39 @@ function ProductsPage() {
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={submit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label>Product photo</Label>
+              <div className="flex items-center gap-3">
+                <ProductThumb
+                  url={photoPreview}
+                  name={form.name || "product"}
+                  className="size-20 rounded-lg"
+                />
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="outline" onClick={() => fileInput.current?.click()}>
+                    <Upload className="size-4" /> {photoPreview ? "Change photo" : "Upload photo"}
+                  </Button>
+                  {photoPreview ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="text-destructive"
+                      onClick={() => resetPhoto(null)}
+                    >
+                      <X className="size-4" /> Remove
+                    </Button>
+                  ) : null}
+                  <input
+                    ref={fileInput}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => pickPhoto(e.target.files?.[0])}
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">JPG, PNG or WebP, up to 5 MB.</p>
+            </div>
             <div className="space-y-1.5">
               <Label htmlFor="name">Product name</Label>
               <Input
@@ -405,8 +495,8 @@ function ProductsPage() {
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={save.isPending}>
-                {editing ? "Save changes" : "Save product"}
+              <Button type="submit" disabled={save.isPending || uploading}>
+                {uploading ? "Uploading photo…" : editing ? "Save changes" : "Save product"}
               </Button>
             </DialogFooter>
           </form>
@@ -429,6 +519,7 @@ function ProductsPage() {
                 if (!toDelete) return;
                 try {
                   await remove.mutateAsync(toDelete.id);
+                  if (toDelete.image_path) await removeProductImage(toDelete.image_path);
                   toast.success("Product deleted");
                 } catch (err) {
                   toast.error(friendlyError(err));
