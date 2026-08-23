@@ -247,7 +247,47 @@ export type ProductInput = {
   stock_qty: number;
   min_stock: number;
   supplier_id: string | null;
+  image_path?: string | null;
 };
+
+export const PRODUCT_IMAGE_BUCKET = "product-images";
+
+export async function uploadProductImage(file: File): Promise<string> {
+  if (!file.type.startsWith("image/")) throw new Error("Please choose an image file.");
+  if (file.size > 5 * 1024 * 1024) throw new Error("Image must be 5 MB or smaller.");
+  const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase();
+  const path = `${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage
+    .from(PRODUCT_IMAGE_BUCKET)
+    .upload(path, file, { cacheControl: "3600", upsert: false });
+  if (error) throw error;
+  return path;
+}
+
+export async function removeProductImage(path: string) {
+  await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([path]);
+}
+
+/** Signed URLs for product photos (bucket is private). */
+export function useProductImageUrls(paths: (string | null)[]) {
+  const unique = Array.from(new Set(paths.filter((p): p is string => !!p))).sort();
+  return useQuery({
+    queryKey: ["product-image-urls", unique],
+    enabled: unique.length > 0,
+    staleTime: 1000 * 60 * 30,
+    queryFn: async (): Promise<Record<string, string>> => {
+      const { data, error } = await supabase.storage
+        .from(PRODUCT_IMAGE_BUCKET)
+        .createSignedUrls(unique, 60 * 60);
+      if (error) throw error;
+      const map: Record<string, string> = {};
+      for (const item of data ?? []) {
+        if (item.path && item.signedUrl) map[item.path] = item.signedUrl;
+      }
+      return map;
+    },
+  });
+}
 
 export function useSaveProduct() {
   const invalidate = useInvalidateAll();
