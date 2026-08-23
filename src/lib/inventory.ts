@@ -24,6 +24,7 @@ export type Product = {
   stock_qty: number;
   min_stock: number;
   supplier_id: string | null;
+  image_path: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
