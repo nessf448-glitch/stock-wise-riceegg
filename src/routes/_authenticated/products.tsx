@@ -496,8 +496,7 @@ function ProductsPage() {
                 Cancel
               </Button>
               <Button type="submit" disabled={save.isPending || uploading}>
-                {uploading ? "Uploading photo…" : null}
-                {editing ? "Save changes" : "Save product"}
+                {uploading ? "Uploading photo…" : editing ? "Save changes" : "Save product"}
               </Button>
             </DialogFooter>
           </form>
