@@ -519,6 +519,7 @@ function ProductsPage() {
                 if (!toDelete) return;
                 try {
                   await remove.mutateAsync(toDelete.id);
+                  if (toDelete.image_path) await removeProductImage(toDelete.image_path);
                   toast.success("Product deleted");
                 } catch (err) {
                   toast.error(friendlyError(err));
