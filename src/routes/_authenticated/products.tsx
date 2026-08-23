@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { useRef, useState } from "react";
+import { Plus, Pencil, Trash2, Search, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ProductThumb } from "@/components/product-image";
 import { PageHeader } from "@/components/app-shell";
 import { CategoryBadge, StockBadge } from "@/components/status-badges";
 import { Button } from "@/components/ui/button";
