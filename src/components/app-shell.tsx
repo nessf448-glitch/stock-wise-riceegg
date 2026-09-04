@@ -30,6 +30,7 @@ const NAV = [
   { to: "/products", label: "Products", icon: Package },
   { to: "/suppliers", label: "Suppliers", icon: Truck },
   { to: "/reports", label: "Reports", icon: FileBarChart },
+  { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
 function NavList({ alertCount, onNavigate }: { alertCount: number; onNavigate?: () => void }) {
