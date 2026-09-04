@@ -443,3 +443,36 @@ export function isToday(iso: string) {
     d.getDate() === now.getDate()
   );
 }
+
+/* ---------------- login background ---------------- */
+
+export const LOGIN_BG_PREFIX = "branding/";
+
+export async function uploadLoginBackground(file: File): Promise<string> {
+  if (!file.type.startsWith("image/")) throw new Error("Please choose an image file.");
+  if (file.size > 8 * 1024 * 1024) throw new Error("Image must be 8 MB or smaller.");
+  const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase();
+  const path = `${LOGIN_BG_PREFIX}${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage
+    .from(PRODUCT_IMAGE_BUCKET)
+    .upload(path, file, { cacheControl: "60", upsert: false });
+  if (error) throw error;
+  return path;
+}
+
+export function useSaveLoginBackground() {
+  const invalidate = useInvalidateAll();
+  return useMutation({
+    mutationFn: async ({ path, previous }: { path: string | null; previous?: string | null }) => {
+      const { error } = await supabase
+        .from("app_settings")
+        .update({ login_bg_path: path, updated_at: new Date().toISOString() })
+        .eq("id", 1);
+      if (error) throw error;
+      if (previous && previous !== path) {
+        await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([previous]);
+      }
+    },
+    onSuccess: invalidate,
+  });
+}
