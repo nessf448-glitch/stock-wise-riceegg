@@ -10,6 +10,7 @@ import {
   Truck,
   FileBarChart,
   LogOut,
+  Settings,
   Wheat,
   Menu,
 } from "lucide-react";
