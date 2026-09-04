@@ -20,6 +20,7 @@ import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedSuppliersRouteImport } from './routes/_authenticated/suppliers'
 import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated/transactions'
+import { Route as ApiPublicLoginBackgroundRouteImport } from './routes/api/public/login-background'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -76,6 +77,12 @@ const AuthenticatedTransactionsRoute =
     path: '/transactions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicLoginBackgroundRoute =
+  ApiPublicLoginBackgroundRouteImport.update({
+    id: '/api/public/login-background',
+    path: '/api/public/login-background',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/reports': typeof AuthenticatedReportsRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
+  '/api/public/login-background': typeof ApiPublicLoginBackgroundRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -100,6 +108,7 @@ export interface FileRoutesByTo {
   '/reports': typeof AuthenticatedReportsRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
+  '/api/public/login-background': typeof ApiPublicLoginBackgroundRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -114,6 +123,7 @@ export interface FileRoutesById {
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/suppliers': typeof AuthenticatedSuppliersRoute
   '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
+  '/api/public/login-background': typeof ApiPublicLoginBackgroundRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/suppliers'
     | '/transactions'
+    | '/api/public/login-background'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/suppliers'
     | '/transactions'
+    | '/api/public/login-background'
   id:
     | '__root__'
     | '/'
@@ -153,12 +165,14 @@ export interface FileRouteTypes {
     | '/_authenticated/reports'
     | '/_authenticated/suppliers'
     | '/_authenticated/transactions'
+    | '/api/public/login-background'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicLoginBackgroundRoute: typeof ApiPublicLoginBackgroundRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -240,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTransactionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/login-background': {
+      id: '/api/public/login-background'
+      path: '/api/public/login-background'
+      fullPath: '/api/public/login-background'
+      preLoaderRoute: typeof ApiPublicLoginBackgroundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -272,6 +293,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicLoginBackgroundRoute: ApiPublicLoginBackgroundRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
