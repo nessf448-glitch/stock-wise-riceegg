@@ -39,6 +39,7 @@ function AuthPage() {
   const navigate = useNavigate();
   const { session, loading } = useSession();
   const [busy, setBusy] = useState(false);
+  const [bgOk, setBgOk] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
