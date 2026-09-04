@@ -17,16 +17,19 @@ export type Database = {
       app_settings: {
         Row: {
           id: number
+          login_bg_path: string | null
           near_expiry_days: number
           updated_at: string
         }
         Insert: {
           id?: number
+          login_bg_path?: string | null
           near_expiry_days?: number
           updated_at?: string
         }
         Update: {
           id?: number
+          login_bg_path?: string | null
           near_expiry_days?: number
           updated_at?: string
         }
