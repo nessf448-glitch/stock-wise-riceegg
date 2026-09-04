@@ -216,14 +216,18 @@ export function useSettings() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("app_settings")
-        .select("near_expiry_days")
+        .select("near_expiry_days, login_bg_path")
         .eq("id", 1)
         .maybeSingle();
       if (error) throw error;
-      return { near_expiry_days: Number(data?.near_expiry_days ?? 7) };
+      return {
+        near_expiry_days: Number(data?.near_expiry_days ?? 7),
+        login_bg_path: (data?.login_bg_path ?? null) as string | null,
+      };
     },
   });
 }
+
 
 /* ---------------- mutations ---------------- */
 
