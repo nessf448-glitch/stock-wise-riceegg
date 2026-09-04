@@ -39,6 +39,7 @@ function AuthPage() {
   const navigate = useNavigate();
   const { session, loading } = useSession();
   const [busy, setBusy] = useState(false);
+  const [bgOk, setBgOk] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -104,8 +105,19 @@ function AuthPage() {
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
-      <div className="bg-harvest hidden flex-col justify-between p-10 text-primary-foreground lg:flex">
-        <Link to="/" className="flex items-center gap-3">
+      <div className="bg-harvest relative hidden flex-col justify-between overflow-hidden p-10 text-primary-foreground lg:flex">
+        {bgOk ? (
+          <>
+            <img
+              src="/api/public/login-background"
+              alt="CDP Enterprise store"
+              className="absolute inset-0 size-full object-cover"
+              onError={() => setBgOk(false)}
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(150deg,oklch(0.28_0.05_158/0.9),oklch(0.42_0.09_156/0.7))]" />
+          </>
+        ) : null}
+        <Link to="/" className="relative flex items-center gap-3">
           <div className="grid size-10 place-items-center rounded-xl bg-accent text-accent-foreground">
             <Wheat className="size-5" />
           </div>
@@ -114,7 +126,7 @@ function AuthPage() {
             <p className="text-[11px] opacity-75">Catalunan Grande, Davao City</p>
           </div>
         </Link>
-        <div>
+        <div className="relative">
           <h2 className="font-display text-4xl leading-tight font-extrabold">
             Smart Inventory Management with Automated Stock Monitoring
           </h2>
@@ -123,8 +135,9 @@ function AuthPage() {
             history — for authorized personnel only.
           </p>
         </div>
-        <p className="text-xs opacity-60">Version 1.0 · Inventory monitoring use only</p>
+        <p className="relative text-xs opacity-60">Version 1.0 · Inventory monitoring use only</p>
       </div>
+
 
       <div className="flex items-center justify-center px-6 py-14">
         <div className="w-full max-w-sm">
